@@ -78,7 +78,7 @@ body {
 .roulette-wrapper { position: relative; width: 420px; height: 420px; }
 #canvas { width: 100%; height: 100%; }
 
-/* ポインター：以前より少し小さく調整 */
+/* ポインター:以前より少し小さく調整 */
 .pointer {
   position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
   width: 0; height: 0;
@@ -130,7 +130,7 @@ body {
 
 <div class="main-wrapper">
   <div class="container">
-    <div id="result-display">READY</div>
+    <div id="result-display">準備完了</div>
     <div class="roulette-wrapper">
       <div class="pointer"></div>
       <canvas id="canvas" width="840" height="840"></canvas>
@@ -139,21 +139,18 @@ body {
   </div>
 
   <div class="settings-panel" id="settingsPanel">
-    <h2 style="margin:0; font-size: 1.8rem;">Settings</h2>
+    <h2 style="margin:0; font-size: 1.8rem;">設定</h2>
     <div class="item-list" id="itemList"></div>
-    <button class="top-btn" onclick="addItem()" style="background:var(--operator); color:white; width:100%; padding:18px; margin-bottom: 12px; border-radius: 20px;">+ Add Item</button>
-    <button class="top-btn" onclick="toggleSettings()" style="width:100%; padding:18px; border-radius: 20px;">Close</button>
+    <button class="top-btn" onclick="addItem()" style="background:var(--operator); color:white; width:100%; padding:18px; margin-bottom: 12px; border-radius: 20px;">+ 項目を追加</button>
+    <button class="top-btn" onclick="toggleSettings()" style="width:100%; padding:18px; border-radius: 20px;">閉じる</button>
   </div>
 </div>
 
 <script>
 // --- 初期設定とデータ読み込み ---
 const defaultItems = [
-  { name: '大勝利', weight: 1, color: '#ff375f' },
-  { name: '当たり', weight: 3, color: '#ff9f0a' },
-  { name: '普通', weight: 8, color: '#30d158' },
-  { name: '微妙', weight: 5, color: '#0a84ff' },
-  { name: 'ハズレ', weight: 2, color: '#8e8e93' }
+  { name: '当たり', weight: 1, color: '#ff9f0a' },
+  { name: 'はずれ', weight: 1, color: '#8e8e93' }
 ];
 
 // localStorageから安全にデータを読み込む
@@ -171,7 +168,7 @@ let volumeOn = (localStorage.getItem('volumeOn') !== 'false'); // デフォル�
 let darkMode = (localStorage.getItem('darkMode') !== 'false'); // デフォルトDark
 let lastIdx = -1;
 
-// 色情報をキャッシュする変数（描画パフォーマンス用）
+// 色情報をキャッシュする変数(描画パフォーマンス用)
 let themeColors = {};
 
 const canvas = document.getElementById('canvas');
@@ -227,7 +224,7 @@ function draw() {
     // 半径を少し小さくして枠線が見えやすくする
     ctx.arc(420, 420, 410, startAngle, startAngle + sliceAngle);
     
-    // 【重要】ここで背景色（黒または白）を使って塗りつぶす
+    // 【重要】ここで背景色(黒または白)を使って塗りつぶす
     ctx.fillStyle = themeColors.bg;
     ctx.fill();
     
@@ -278,7 +275,7 @@ function startSpin() {
     currentRotation += velocity;
     velocity *= friction;
 
-    // 現在の角度からポインター位置（上部270度地点）にあるアイテムを計算
+    // 現在の角度からポインター位置(上部270度地点)にあるアイテムを計算
     let checkAngle = (1.5 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
     if(checkAngle < 0) checkAngle += 2 * Math.PI;
     
@@ -305,7 +302,7 @@ function startSpin() {
       const resultItem = items[lastIdx];
       const display = document.getElementById('result-display');
       display.innerText = resultItem.name;
-      // 結果表示を目立たせる（アイテムの色があればそれを使う、なければテーマ色）
+      // 結果表示を目立たせる(アイテムの色があればそれを使う、なければテーマ色)
       display.style.color = resultItem.color || themeColors.text; 
     }
   }
@@ -344,7 +341,7 @@ function updateItem(index, key, value) {
 function addItem() {
   const colors = ['#ff375f', '#ff9f0a', '#30d158', '#0a84ff', '#bf5af2', '#64d2ff'];
   items.push({ 
-    name: 'New Item', 
+    name: '新しい項目', 
     weight: 1, 
     color: colors[items.length % colors.length] 
   });
