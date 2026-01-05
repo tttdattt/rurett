@@ -15,8 +15,6 @@
   --operator-shadow: rgba(255, 149, 0, 0.1);
   --border: rgba(0, 0, 0, 0.03);
   --shadow-soft: 0 20px 60px rgba(0, 0, 0, 0.03), 0 4px 12px rgba(0, 0, 0, 0.01);
-  
-  /* ライトモードのルーレット色 */
   --roulette-bg: #e5e5ea;
   --roulette-border: #8e8e93;
   --roulette-text: #1c1c1e;
@@ -34,8 +32,6 @@ body.dark {
   --operator-shadow: rgba(255, 159, 10, 0.15);
   --border: rgba(255, 255, 255, 0.04);
   --shadow-soft: 0 30px 80px rgba(0, 0, 0, 0.5);
-
-  /* ダークモードのルーレット色（ここでしっかり黒を指定） */
   --roulette-bg: #1c1c1e;
   --roulette-border: #3a3a3c;
   --roulette-text: #ffffff;
@@ -48,21 +44,23 @@ body {
   margin: 0; min-height: 100vh; display: flex; align-items: center; justify-content: center;
   background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  overflow-x: hidden;
+  overflow: hidden;
   -webkit-tap-highlight-color: transparent;
 }
 
+/* 全体を画面幅いっぱいに使いつつバランスを保つコンテナ */
 .main-wrapper {
   display: flex; align-items: stretch; justify-content: center;
   gap: 24px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  max-width: 98vw;
+  width: 100vw; padding: 24px; max-width: 100vw;
 }
 
 .container {
-  width: 720px; background: var(--card); border-radius: 36px;
-  padding: 48px; box-shadow: var(--shadow-soft);
-  display: flex; flex-direction: column; align-items: center; gap: 32px;
+  width: min(1100px, 96vw); background: var(--card); border-radius: 28px;
+  padding: 40px; box-shadow: var(--shadow-soft);
+  display: flex; flex-direction: column; align-items: center; gap: 28px;
   position: relative; transition: background 0.3s;
+  max-height: calc(100vh - 48px); overflow: auto;
 }
 
 .settings-panel {
@@ -72,52 +70,59 @@ body {
   transform: translateX(20px);
 }
 .settings-panel.open {
-  width: 360px; opacity: 1; padding: 40px; pointer-events: auto; transform: translateX(0);
+  width: min(380px, 34vw); opacity: 1; padding: 32px; pointer-events: auto; transform: translateX(0);
 }
 
-.roulette-wrapper { position: relative; width: 420px; height: 420px; }
-#canvas { width: 100%; height: 100%; }
+/* ルーレットをビューポートに合わせて拡大（バランス重視） */
+.roulette-wrapper { position: relative; width: min(66vmin, 720px); height: min(66vmin, 720px); }
+#canvas { width: 100%; height: 100%; display: block; }
 
-/* ポインター:以前より少し小さく調整 */
+/* ポインター（少し控えめに） */
 .pointer {
-  position: absolute; top: -15px; left: 50%; transform: translateX(-50%);
+  position: absolute; top: -18px; left: 50%; transform: translateX(-50%);
   width: 0; height: 0;
-  border-left: 12px solid transparent;
-  border-right: 12px solid transparent;
-  border-top: 40px solid var(--pointer-color);
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 36px solid var(--pointer-color);
   z-index: 10;
   transition: border-top-color 0.3s;
   filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
 }
 
-.top-buttons { position: fixed; top: 24px; right: 24px; display: flex; gap: 12px; z-index: 2000; }
+.top-buttons { position: fixed; top: 18px; right: 18px; display: flex; gap: 12px; z-index: 2000; }
 .top-btn {
-  background: var(--button); border: none; padding: 12px 20px; border-radius: 16px;
+  background: var(--button); border: none; padding: 10px 16px; border-radius: 14px;
   cursor: pointer; color: var(--text); transition: all 0.2s; font-weight: 600; font-size: 0.9rem;
 }
 .top-btn:hover { background: var(--button-hover); }
 
 .spin-btn {
-  background: var(--operator); color: #fff; border: none; padding: 20px 90px;
-  border-radius: 45px; font-size: 1.5rem; font-weight: bold; cursor: pointer;
+  background: var(--operator); color: #fff; border: none; padding: 16px 72px;
+  border-radius: 40px; font-size: 1.35rem; font-weight: 800; cursor: pointer;
   transition: all 0.3s; box-shadow: 0 10px 30px var(--operator-shadow);
 }
 .spin-btn:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 15px 40px var(--operator-shadow); }
 .spin-btn:disabled { opacity: 0.5; transform: none; cursor: not-allowed; }
 
-#result-display { font-size: 2.6rem; font-weight: 900; color: var(--operator); min-height: 3.5rem; letter-spacing: -1px; text-align: center; }
+#result-display { font-size: 2rem; font-weight: 900; color: var(--operator); min-height: 3rem; letter-spacing: -0.5px; text-align: center; }
 
-.item-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; margin: 24px 0; padding-right: 5px; }
+.item-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin: 18px 0; padding-right: 5px; }
 .item-row { display: flex; gap: 10px; align-items: center; }
-.item-row input { background: var(--bg); border: 1px solid var(--border); padding: 12px; border-radius: 12px; color: var(--text); outline: none; width: 100%; transition: border 0.2s; }
+.item-row input { background: var(--bg); border: 1px solid var(--border); padding: 10px; border-radius: 12px; color: var(--text); outline: none; width: 100%; transition: border 0.2s; }
 .item-row input:focus { border-color: var(--operator); }
 .item-weight { max-width: 65px; text-align: center; }
-.del-btn { background: rgba(255, 59, 48, 0.1); color: #ff453a; border: none; border-radius: 12px; cursor: pointer; padding: 12px; font-weight: bold; transition: background 0.2s; }
+.del-btn { background: rgba(255, 59, 48, 0.1); color: #ff453a; border: none; border-radius: 12px; cursor: pointer; padding: 10px; font-weight: bold; transition: background 0.2s; }
 .del-btn:hover { background: rgba(255, 59, 48, 0.2); }
 
 /* スクロールバーのスタイル調整 */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--button-hover); border-radius: 10px; }
+
+@media (max-width: 760px) {
+  .container { padding: 20px; border-radius: 18px; }
+  .spin-btn { padding: 12px 40px; font-size: 1.05rem; }
+  .pointer { border-top: 30px solid var(--pointer-color); }
+}
 </style>
 </head>
 <body class="dark">
@@ -133,16 +138,16 @@ body {
     <div id="result-display">準備完了</div>
     <div class="roulette-wrapper">
       <div class="pointer"></div>
-      <canvas id="canvas" width="840" height="840"></canvas>
+      <canvas id="canvas"></canvas>
     </div>
     <button class="spin-btn" id="spinBtn" onclick="startSpin()">回す</button>
   </div>
 
   <div class="settings-panel" id="settingsPanel">
-    <h2 style="margin:0; font-size: 1.8rem;">設定</h2>
+    <h2 style="margin:0; font-size: 1.6rem;">設定</h2>
     <div class="item-list" id="itemList"></div>
-    <button class="top-btn" onclick="addItem()" style="background:var(--operator); color:white; width:100%; padding:18px; margin-bottom: 12px; border-radius: 20px;">+ 項目を追加</button>
-    <button class="top-btn" onclick="toggleSettings()" style="width:100%; padding:18px; border-radius: 20px;">閉じる</button>
+    <button class="top-btn" onclick="addItem()" style="background:var(--operator); color:white; width:100%; padding:14px; margin-bottom: 12px; border-radius: 16px;">+ 項目を追加</button>
+    <button class="top-btn" onclick="toggleSettings()" style="width:100%; padding:14px; border-radius: 16px;">閉じる</button>
   </div>
 </div>
 
@@ -153,7 +158,6 @@ const defaultItems = [
   { name: 'はずれ', weight: 1, color: '#8e8e93' }
 ];
 
-// localStorageから安全にデータを読み込む
 let items;
 try {
   const saved = localStorage.getItem('rouletteItems');
@@ -164,26 +168,34 @@ try {
 
 let currentRotation = 0;
 let isSpinning = false;
-let volumeOn = (localStorage.getItem('volumeOn') !== 'false'); // デフォルトON
-let darkMode = (localStorage.getItem('darkMode') !== 'false'); // デフォルトDark
+let volumeOn = (localStorage.getItem('volumeOn') !== 'false');
+let darkMode = (localStorage.getItem('darkMode') !== 'false');
 let lastIdx = -1;
 
-// 色情報をキャッシュする変数(描画パフォーマンス用)
 let themeColors = {};
 
 const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-// --- データの保存 ---
+// --- レスポンシブなキャンバス準備 ---
+function resizeCanvasForDisplay() {
+  // canvas の表示サイズを保持しつつピクセル比に合わせて内部解像度を設定
+  const ratio = window.devicePixelRatio || 1;
+  const displayWidth = canvas.clientWidth;
+  const displayHeight = canvas.clientHeight;
+  canvas.width = Math.round(displayWidth * ratio);
+  canvas.height = Math.round(displayHeight * ratio);
+  // スケールを設定して以後の描画をCSSピクセル基準で行えるようにする
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+}
+
 function saveToStorage() {
   localStorage.setItem('rouletteItems', JSON.stringify(items));
   localStorage.setItem('darkMode', darkMode);
   localStorage.setItem('volumeOn', volumeOn);
 }
 
-// --- 色情報の更新 ---
-// 重要: ダークモード切り替え時にこの関数が呼ばれ、JS内の色変数を更新します
 function updateThemeColors() {
   const style = getComputedStyle(document.body);
   themeColors = {
@@ -194,7 +206,6 @@ function updateThemeColors() {
   };
 }
 
-// --- 効果音 ---
 function playClickSound() {
   if(!volumeOn) return;
   const osc = audioCtx.createOscillator();
@@ -208,77 +219,83 @@ function playClickSound() {
   osc.start(); osc.stop(audioCtx.currentTime + 0.05);
 }
 
-// --- 描画処理 ---
+// --- 描画処理（中心と半径は動的に計算） ---
 function draw() {
+  resizeCanvasForDisplay();
+
+  const displayW = canvas.clientWidth;
+  const displayH = canvas.clientHeight;
+  const cx = displayW / 2;
+  const cy = displayH / 2;
+  const radius = Math.min(cx, cy) - 12; // 少しマージン
+
   const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
   let startAngle = currentRotation;
-  
-  // キャンバスをクリア
+
+  // クリア
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+  // 各スライス描画
   items.forEach((item) => {
     const sliceAngle = (item.weight / totalWeight) * 2 * Math.PI;
-    
+
     ctx.beginPath();
-    ctx.moveTo(420, 420);
-    // 半径を少し小さくして枠線が見えやすくする
-    ctx.arc(420, 420, 410, startAngle, startAngle + sliceAngle);
-    
-    // 【重要】ここで背景色(黒または白)を使って塗りつぶす
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, radius, startAngle, startAngle + sliceAngle);
+
     ctx.fillStyle = themeColors.bg;
     ctx.fill();
-    
-    // 枠線
+
     ctx.strokeStyle = themeColors.border;
-    ctx.lineWidth = 3;
+    ctx.lineWidth = Math.max(2, radius * 0.008);
     ctx.stroke();
 
-    // 文字の描画
+    // 文字描画
     ctx.save();
-    ctx.translate(420, 420);
+    ctx.translate(cx, cy);
     ctx.rotate(startAngle + sliceAngle / 2);
     ctx.textAlign = "right";
     ctx.fillStyle = themeColors.text;
-    ctx.font = "bold 34px -apple-system, BlinkMacSystemFont, sans-serif";
-    // 長い名前が枠外に出ないように少し調整
-    ctx.fillText(item.name, 380, 12);
+    const fontSize = Math.max(14, Math.floor(radius * 0.11));
+    ctx.font = `bold ${fontSize}px -apple-system, BlinkMacSystemFont, sans-serif`;
+    ctx.fillText(item.name, radius - Math.max(36, Math.floor(radius*0.05)), Math.max(12, Math.floor(fontSize*0.35)));
     ctx.restore();
-    
+
     startAngle += sliceAngle;
   });
 
-  // --- 中央の丸の描画 ---
+  // 中央の丸
   ctx.beginPath();
-  ctx.arc(420, 420, 35, 0, 2 * Math.PI); // 半径35px
+  ctx.arc(cx, cy, Math.max(20, Math.floor(radius * 0.08)), 0, 2 * Math.PI);
   ctx.fillStyle = themeColors.center;
   ctx.fill();
   ctx.strokeStyle = themeColors.border;
-  ctx.lineWidth = 4;
+  ctx.lineWidth = Math.max(3, radius * 0.01);
   ctx.stroke();
 }
 
-// --- ルーレット回転ロジック ---
+// --- 回転ロジック ---
 function startSpin() {
   if (isSpinning) return;
   if(audioCtx.state === 'suspended') audioCtx.resume();
-  
+
   isSpinning = true;
   document.getElementById('spinBtn').disabled = true;
   document.getElementById('result-display').innerText = "運命の定めは..";
   document.getElementById('result-display').style.color = 'var(--operator)';
 
   const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
-  let velocity = 0.3 + Math.random() * 0.2; 
-  const friction = 0.9975; 
+  let velocity = 0.3 + Math.random() * 0.2;
+  const friction = 0.9975;
 
   function animate() {
     currentRotation += velocity;
     velocity *= friction;
 
-    // 現在の角度からポインター位置(上部270度地点)にあるアイテムを計算
+    // ポインター位置は上（270度）: 1.5π - currentRotation
     let checkAngle = (1.5 * Math.PI - (currentRotation % (2 * Math.PI))) % (2 * Math.PI);
     if(checkAngle < 0) checkAngle += 2 * Math.PI;
-    
+
     let currentIdx = 0;
     let acc = 0;
     for(let i=0; i<items.length; i++) {
@@ -286,9 +303,8 @@ function startSpin() {
       if(checkAngle < acc) { currentIdx = i; break; }
     }
 
-    // アイテムが切り替わったら音を鳴らす
     if(currentIdx !== lastIdx) {
-      if (velocity > 0.005) playClickSound(); // 最後の方は音を止める
+      if (velocity > 0.005) playClickSound();
       lastIdx = currentIdx;
     }
 
@@ -302,8 +318,7 @@ function startSpin() {
       const resultItem = items[lastIdx];
       const display = document.getElementById('result-display');
       display.innerText = resultItem.name;
-      // 結果表示を目立たせる(アイテムの色があればそれを使う、なければテーマ色)
-      display.style.color = resultItem.color || themeColors.text; 
+      display.style.color = resultItem.color || themeColors.text;
     }
   }
   animate();
@@ -348,8 +363,6 @@ function addItem() {
   renderSettings();
   saveToStorage();
   draw();
-  
-  // 追加したのがわかるように少しスクロール
   setTimeout(() => {
     const list = document.getElementById('itemList');
     list.scrollTop = list.scrollHeight;
@@ -367,7 +380,6 @@ function removeItem(index) {
   }
 }
 
-// --- システム設定 ---
 function toggleVolume() { 
   volumeOn = !volumeOn;
   document.getElementById('volBtn').innerText = volumeOn ? '🔊 ON' : '🔇 OFF';
@@ -376,15 +388,12 @@ function toggleVolume() {
 
 function toggleDarkMode() {
   darkMode = !darkMode;
-  applyTheme(); // ここでテーマ適用と再描画を行う
+  applyTheme();
 }
 
 function applyTheme() {
   document.body.classList.toggle('dark', darkMode);
   document.getElementById('themeBtn').innerText = darkMode ? '🌙' : '☀️';
-  
-  // 重要: CSS変数が反映されるのを待ってから色を取得
-  // ブラウザのレンダリングタイミングに合わせる
   requestAnimationFrame(() => {
     updateThemeColors();
     draw();
@@ -395,11 +404,10 @@ function applyTheme() {
 // --- 初期化 ---
 applyTheme();
 document.getElementById('volBtn').innerText = volumeOn ? '🔊 ON' : '🔇 OFF';
-updateThemeColors(); // 初回実行
-draw();
-
-// ウィンドウリサイズ時もきれいに再描画
-window.addEventListener('resize', draw);
+updateThemeColors();
+// 初期表示サイズ調整
+window.addEventListener('load', () => { resizeCanvasForDisplay(); draw(); });
+window.addEventListener('resize', () => { resizeCanvasForDisplay(); draw(); });
 
 </script>
 </body>
