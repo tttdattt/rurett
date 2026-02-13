@@ -114,6 +114,24 @@ body {
 .del-btn { background: rgba(255, 59, 48, 0.1); color: #ff453a; border: none; border-radius: 12px; cursor: pointer; padding: 10px; font-weight: bold; transition: background 0.2s; }
 .del-btn:hover { background: rgba(255, 59, 48, 0.2); }
 
+/* モーダル（確認ダイアログ） */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); display: flex; align-items: center; justify-content: center; z-index: 3000;
+  /* 初期は透明・操作不可にしておき、open クラスで表示 */
+  opacity: 0; pointer-events: none; transition: opacity 360ms cubic-bezier(0.22, 1, 0.36, 1); will-change: opacity;
+}
+.modal-overlay.open { opacity: 1; pointer-events: auto; }
+
+/* モーダル本体は少し下にありつつ縮小している状態から拡大してフェードインする */
+.modal { background: var(--card); padding: 20px; border-radius: 12px; width: min(360px, 90vw); box-shadow: var(--shadow-soft); text-align: center;
+  transform: translateY(8px) scale(0.96); opacity: 0; transition: transform 420ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms cubic-bezier(0.22, 1, 0.36, 1); will-change: transform, opacity;
+}
+.modal-overlay.open .modal { transform: translateY(0) scale(1); opacity: 1; }
+
+.modal p { margin: 0 0 16px 0; }
+.modal .btns { display:flex; gap:12px; justify-content:center; }
+.modal .btns .top-btn { min-width: 100px; }
+
+
 /* スクロールバーのスタイル調整 */
 ::-webkit-scrollbar { width: 6px; }
 ::-webkit-scrollbar-thumb { background: var(--button-hover); border-radius: 10px; }
@@ -144,10 +162,24 @@ body {
   </div>
 
   <div class="settings-panel" id="settingsPanel">
-    <h2 style="margin:0; font-size: 1.6rem;">設定</h2>
+    <div style="display:flex; gap:8px; align-items:center; width:100%; justify-content:space-between; margin-bottom:12px;">
+      <h2 style="margin:0; font-size: 1.6rem;">設定</h2>
+      <button class="top-btn" id="resetBtn" onclick="openConfirmModal()" style="background:#ff3b30; color:white;">リセット</button>
+    </div>
     <div class="item-list" id="itemList"></div>
     <button class="top-btn" onclick="addItem()" style="background:var(--operator); color:white; width:100%; padding:14px; margin-bottom: 12px; border-radius: 16px;">+ 項目を追加</button>
     <button class="top-btn" onclick="toggleSettings()" style="width:100%; padding:14px; border-radius: 16px;">閉じる</button>
+  </div>
+</div>
+
+<!-- 確認モーダル -->
+<div id="confirmModal" class="modal-overlay" aria-hidden="true">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+    <p id="confirmTitle">リセットしますか？</p>
+    <div class="btns">
+      <button class="top-btn" onclick="doReset()">はい</button>
+      <button class="top-btn" onclick="closeConfirmModal()">キャンセル</button>
+    </div>
   </div>
 </div>
 
@@ -281,7 +313,7 @@ function startSpin() {
 
   isSpinning = true;
   document.getElementById('spinBtn').disabled = true;
-  document.getElementById('result-display').innerText = "運命の定めは..";
+  document.getElementById('result-display').innerText = "ルーレット中..";
   document.getElementById('result-display').style.color = 'var(--operator)';
 
   const totalWeight = items.reduce((sum, i) => sum + i.weight, 0);
@@ -370,14 +402,32 @@ function addItem() {
 }
 
 function removeItem(index) {
-  if(items.length > 2) {
+  if(items.length > 1) {
     items.splice(index, 1);
     renderSettings();
     saveToStorage();
     draw();
   } else {
-    alert("最低2つの項目が必要です");
+    alert("最低1つの項目が必要です");
   }
+}
+
+// --- リセット関連 ---
+function openConfirmModal() {
+  document.getElementById('confirmModal').classList.add('open');
+  document.getElementById('confirmModal').setAttribute('aria-hidden', 'false');
+}
+function closeConfirmModal() {
+  document.getElementById('confirmModal').classList.remove('open');
+  document.getElementById('confirmModal').setAttribute('aria-hidden', 'true');
+}
+function doReset() {
+  // すべての項目を空白名にし、重みを1に戻す（項目数は変更しない）
+  items = items.map(it => ({ name: '', weight: 1, color: it.color || '#ff375f' }));
+  saveToStorage();
+  renderSettings();
+  draw();
+  closeConfirmModal();
 }
 
 function toggleVolume() { 
